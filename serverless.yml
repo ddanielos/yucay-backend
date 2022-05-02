@@ -1,0 +1,47 @@
+service: aws-lambda-webyucay
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: sa-east-1
+  iamRoleStatements: 
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:sa-east-1:237206565939:table/BeerTypes
+
+functions:
+  hello:
+    handler: src/handler.hello
+    events:
+      - httpApi:
+          path: /
+          method: get
+  createBeer:
+    handler: src/addBeer.addBeer
+    events:
+      - httpApi:
+          path: /beers
+          method: post
+  getBeer:
+    handler: src/getBeers.getBeers
+    events:
+      - httpApi:
+          path: /beers
+          method: get
+
+resources:
+  Resources:
+    BeerTypes:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: BeerTypes
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
